@@ -50,6 +50,7 @@ forwardstatus
 &lt;proxyip&gt;10.0.1.1,10.0.1.2,10.0.0.3,10.0.0.4,10.0.0.5,10.0.0.6,10.0.0.7&lt;/proxyip&gt;
 
 my.cnf修改:
+
 将如下内容加入到my.cnf合适位置后重启mysql即可
 
 innodb_lock_wait_timeout=43200
