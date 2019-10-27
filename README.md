@@ -21,23 +21,29 @@ forwardstatus
 
 安装:
 
-1.安装Redis及Mysql
+1.安装Redis
 
-2.apt update
+2.安装Mysql
 
-3.apt install php php-posix php-pdo-sqlite php-curl
+3.apt update
 
-4.编辑config.php及导入dbsql.sql到Mysql
+4.apt install php php-posix php-pdo-sqlite php-curl
 
-5.Debug : php start.php start Daemon: php start.php start -d
+5.编辑config.php
 
-6.Whmcs后台启用流量监控插件
+6.导入dbsql.sql到Mysql
 
-7.添加服务器
+7.修改my.cnf并重启mysql
 
-8.添加产品
+8.Debug : php start.php start Daemon: php start.php start -d
 
-9.开通测试
+9.Whmcs后台启用流量监控插件
+
+10.添加服务器
+
+11.添加产品
+
+12.开通测试
 
 服务器可选Hash:
 
