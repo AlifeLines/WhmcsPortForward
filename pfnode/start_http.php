@@ -7,7 +7,8 @@ $http_worker->name = 'Http Api Server';
 $http_worker->count = 4;
 include __DIR__.'/config.php';
 $api_redis_client = new Predis\Client(['scheme' => 'tcp','host' => $RedisIP,'port' => $RedisPort,'parameters'=>['password' => $RedisPass]]);
-Db::setConfig(['type'=> 'sqlite','database'=> 'database.db','prefix'=> '','debug'=> true]);
+//Db::setConfig(['type'=> 'sqlite','database'=> 'database.db','prefix'=> '','debug'=> true]);
+Db::setConfig(['type' => 'mysql','hostname' => $MysqlHost,'username' => $MysqlUsername,'database' => $MysqlDatabase,'password' => $MysqlPassword,'hostport' => $MysqlPort,'charset' => 'utf8','prefix' => '','debug' => true,'break_reconnect' => true]);
 $http_worker->onMessage = function($connection, $data){
 	global $api_redis_client;
 	include __DIR__.'/config.php';

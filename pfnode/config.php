@@ -22,4 +22,14 @@ $RedisIP = '';
 $RedisPort = 6379;
 //Redis Auth Pass
 $RedisPass = '';
+//Mysql主机地址
+$MysqlHost = '127.0.0.1';
+//Mysql用户名
+$MysqlUsername = '';
+//Mysql密码
+$MysqlPassword = '';
+//Mysql数据库名
+$MysqlDatabase = '';
+//Mysql端口
+$MysqlPort = 3306;
 //<------- 信息填写结束! ------>

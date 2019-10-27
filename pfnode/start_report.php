@@ -25,7 +25,8 @@ $report_worker->count = 1;
 $report_worker->name = 'Report Service';
 $report_worker->onWorkerStart = function($report_worker)
 {
-	Db::setConfig(['type'=> 'sqlite','database'=> 'database.db','prefix'=> '','debug'=> true]);
+	//Db::setConfig(['type'=> 'sqlite','database'=> 'database.db','prefix'=> '','debug'=> true]);
+	Db::setConfig(['type' => 'mysql','hostname' => $MysqlHost,'username' => $MysqlUsername,'database' => $MysqlDatabase,'password' => $MysqlPassword,'hostport' => $MysqlPort,'charset' => 'utf8','prefix' => '','debug' => true,'break_reconnect' => true]);
 	//流量统计上报
     \Workerman\Lib\Timer::add(30, function(){
 		include __DIR__.'/config.php';
