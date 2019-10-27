@@ -21,13 +21,13 @@ forwardstatus
 
 安装:
 
-1.安装Redis
+1.安装Redis及Mysql
 
 2.apt update
 
 3.apt install php php-posix php-pdo-sqlite php-curl
 
-4.编辑config.php
+4.编辑config.php及导入dbsql.sql到Mysql
 
 5.Debug : php start.php start Daemon: php start.php start -d
 
