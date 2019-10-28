@@ -246,6 +246,7 @@ function portforward_ClientArea(array $params)
 		$postfields['rsip'] = trim($_REQUEST['rsip']);
 		$postfields['rport'] = trim($_REQUEST['rport']);
 		$postfields['ptype'] = trim($params['customfields']['ptype']);
+		$postfields['maxconnnum'] = trim($params['configoption2']);
 		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
         if(!$ReturnInfo){
             exit(json_encode(array('result' => 'failed','msg' => 'ServiceID不存在')));
