@@ -4,6 +4,10 @@ add_hook('DailyCronJob', 1, function($vars) {
     $todayunsusp = Capsule::table('mod_whmcspf_suspservice')->where('untime',date("Y-m-d"))->get();
 	if($todayunsusp){
 		foreach ( $todayunsusp as $listone){
+			$DataArray = Capsule::table('tblhosting')->where('id',$listone->serviceid)->first();
+			if($DataArray->domainstatus != 'Suspended' || $DataArray->suspendreason != '流量超额'){
+				continue;
+			}
 			localAPI('ModuleUnsuspend', array('serviceid' => $listone->serviceid), Capsule::table('tbladmins')->first()->id);
 			Capsule::table('tblhosting')->where('id',$listone->serviceid)->update(['domainstatus' => 'Active']);
 			whmcspf_setCustomfieldsValue('forwardstatus','Active',$listone->serviceid,null);

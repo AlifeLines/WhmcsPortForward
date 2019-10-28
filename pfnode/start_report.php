@@ -35,10 +35,10 @@ $report_worker->onWorkerStart = function($report_worker)
 			return ;
         }
 		foreach ($data as $dataone){
-			$returnstatus = report_curl_post_https($websiteurl.'/?m=whmcspf&action=reporttraffic',array('serviceid' => $dataone['serviceid'],'authkey' => $WebsiteAuthkey,'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth']));
+			$returnstatus = report_curl_post_https($websiteurl.'/?m=whmcspf&action=reporttraffic',array('serviceid' => $dataone['serviceid'],'authkey' => $WebsiteAuthkey,'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum']));
 			if(trim($returnstatus) != 'success'){
-				echo '['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'])).'时失败,服务器返回'.$returnstatus.PHP_EOL;
-				file_put_contents('error.log','['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'])).'时失败,服务器返回'.$returnstatus.PHP_EOL,FILE_APPEND);
+				echo '['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum'])).'时失败,服务器返回'.$returnstatus.PHP_EOL;
+				file_put_contents('error.log','['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum'])).'时失败,服务器返回'.$returnstatus.PHP_EOL,FILE_APPEND);
 			}
 		}
         unset($data);
@@ -64,11 +64,15 @@ $report_worker->onWorkerStart = function($report_worker)
 			if(!$DownloadByte){
 				$DownloadByte = 0;
 			}
+			$ConnNum = @$report_redis_client->get($dataone['serviceid'].'_maxconnnum');
+			if(!$ConnNum){
+				$ConnNum = 0;
+			}
 			$DownloadMb = round($DownloadByte/1024/1024, 2);
 			$NewBandWidth = $UploadMb + $DownloadMb;
 			//入库
 			try {
-			    Db::table('pfinfo')->where('id',$dataone['id'])->update(["bandwidth" => $dataone['bandwidth'] + $NewBandWidth,"updatetime" => time()]);
+			    Db::table('pfinfo')->where('id',$dataone['id'])->update(["bandwidth" => $dataone['bandwidth'] + $NewBandWidth,"updatetime" => time(),"connnum" => $ConnNum]);
             } catch (Exception $e) {
             }
 		}

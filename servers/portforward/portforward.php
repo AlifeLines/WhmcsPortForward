@@ -1,5 +1,5 @@
 <?php
-
+//Version 2.0
 if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
@@ -18,6 +18,10 @@ function portforward_ConfigOptions()
 {
     return array(
         '每月流量(Mb)' => array(
+            'Type' => 'text',
+            'Size' => '500'
+        ),
+		'最大连接数' => array(
             'Type' => 'text',
             'Size' => '500'
         )
@@ -40,6 +44,7 @@ function portforward_CreateAccount(array $params)
 		$postfields['ptype'] = trim($params['customfields']['ptype']);
 		$postfields['rport'] = trim($params['customfields']['rport']);
 		$postfields['rsip'] = trim($params['customfields']['rsip']);
+		$postfields['maxconnnum'] = trim($params['configoption2']);
 		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
         if(!$ReturnInfo){
             throw new Exception('服务器返回信息为空');	
@@ -121,8 +126,48 @@ function portforward_RebuildConf(array $params)
 
 function portforward_AdminCustomButtonArray(){
     return array(
-        "重建" => "RebuildConf"
+        "重建" => "RebuildConf",
+		"同步配置" => "SyncConf"
     );
+}
+
+function portforward_SyncConf(array $params)
+{
+    try {
+		$postfields['username'] = $params['serverusername'];
+		$postfields['password'] = $params['serverpassword'];
+		$postfields['action'] = 'update';
+		$postfields['serviceid'] = $params['serviceid'];
+		if(!filter_var(trim($params['customfields']['rsip']), FILTER_VALIDATE_IP,FILTER_FLAG_IPV6) && !filter_var(trim($params['customfields']['rsip']), FILTER_VALIDATE_IP)){
+			throw new Exception('IP不正确');
+		}
+		if(!is_numeric(trim($params['customfields']['rport'])) || trim($params['customfields']['rport']) > 25535 || trim($params['customfields']['rport']) < 1){
+			throw new Exception('端口不正确');
+		}
+		$postfields['ptype'] = trim($params['customfields']['ptype']);
+		$postfields['rport'] = trim($params['customfields']['rport']);
+		$postfields['rsip'] = trim($params['customfields']['rsip']);
+		$postfields['maxconnnum'] = trim($params['configoption2']);
+		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
+        if(!$ReturnInfo){
+            throw new Exception('服务器返回信息为空');	
+		}
+        if($ReturnInfo['code'] == 200){
+			Capsule::table('tblhosting')->where('id',$params['serviceid'])->update(['domain' => $params['customfields']['rsip'].':'.trim($params['customfields']['rport'])]);
+			return 'success';
+        }else{
+            throw new Exception('同步失败,'.$ReturnInfo['msg']);
+		}			 
+    } catch (Exception $e) {
+        logModuleCall(
+            'portforward',
+            __FUNCTION__,
+            $params,
+            $e->getMessage(),
+            $e->getTraceAsString()
+        );
+        return $e->getMessage();
+    }
 }
 
 function portforward_UnsuspendAccount(array $params)
