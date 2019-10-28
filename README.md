@@ -1,5 +1,5 @@
 # WhmcsPortForward
-可以对接Whmcs进行销售的端口转发系统，支持TCP/UDP及Ipv6/Ipv4端口转发
+可以对接Whmcs进行销售的端口转发系统，支持TCP/UDP及Ipv6/Ipv4端口转发,支持流量统计限制及连接数统计限制,采用Workerman编写.
 
 默认分支为Sqlite，可切换到Mysql分支使用Mysql数据库!
 
