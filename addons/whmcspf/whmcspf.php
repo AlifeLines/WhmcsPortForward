@@ -9,7 +9,7 @@ function whmcspf_config()
         'name' => '端口转发流量统计', 
         'description' => '端口转发流量统计', 
         'author' => 'Flyqie',
-        'version' => '1.5',
+        'version' => '2.0',
         'fields' => array(
             'authkey' => array(
                 'FriendlyName' => '验证密钥',
@@ -28,6 +28,7 @@ function whmcspf_activate()
 				$table->text('serviceid');
 				$table->text('bandwidth');
 				$table->text('updatetime');
+				$table->text('connnum');
 			});
 		}
 		if (!Capsule::schema()->hasTable('mod_whmcspf_suspservice')) {
@@ -70,8 +71,10 @@ function whmcspf_output($vars)
 			$PackAgeINfo = Capsule::table('tblproducts')->where('id',Capsule::table('tblhosting')->where('id',$values->serviceid)->first()->packageid)->first();
 			if($PackAgeINfo){
 				$AllBandwidth = $PackAgeINfo->configoption1;
+				$maxconnnum = $PackAgeINfo->configoption2;
 			}else{
 				$AllBandwidth = 0;
+				$maxconnnum = 0;
 			}
 			//$AllBandwidth = $PackAgeINfo->configoption1;
 			$FreeBandwidth = $AllBandwidth - $values->bandwidth;
@@ -86,6 +89,7 @@ function whmcspf_output($vars)
 				$unsptime = '无';
 			}
 			$infolistarray[$num]['id'] = $values->id;
+			$infolistarray[$num]['connnum'] = $values->connnum;
 			$infolistarray[$num]['serviceid'] = '<a href="/admin/clientsservices.php?id='.$values->serviceid.'" target="_blank">#'.$values->serviceid.'</a>';
 			$infolistarray[$num]['usedbandwidth'] = $values->bandwidth;
 			$infolistarray[$num]['freebandwidth'] = $FreeBandwidth;
@@ -93,6 +97,7 @@ function whmcspf_output($vars)
 			$infolistarray[$num]['updatetime'] = date('Y-m-d H:i:s', $values->updatetime);
 			$infolistarray[$num]['unsptime'] = $unsptime;
 			$infolistarray[$num]['status'] = $Status;
+			$infolistarray[$num]['maxconnnum'] = $maxconnnum;
 			$num++;
 		}
 		$Infoarray['result'] = 'success';
@@ -117,30 +122,43 @@ function whmcspf_clientarea($vars)
 		if(!$PackAgeINfo){
 			exit('产品找不到');
 		}
-		if(!@$_REQUEST['serviceid'] || !@$_REQUEST['updatetime'] || !@$_REQUEST['bandwidth']){
+		if(!@$_REQUEST['serviceid'] || !@$_REQUEST['updatetime']){
 			exit('参数不完整');
+		}
+		if(!@$_REQUEST['bandwidth']){
+			$BandWidth = 0;
+		}else{
+			$BandWidth = $_REQUEST['bandwidth'];
 		}
 		if(Capsule::table('tblhosting')->where('id',$_REQUEST['serviceid'])->first()->domainstatus != 'Active'){
 			//说明已经被暂停了,可以直接不进行下面的操作
 			exit('success');
 		}
-		if(Capsule::table('mod_whmcspf')->where('serviceid',$_REQUEST['serviceid'])->first()){
-			Capsule::table('mod_whmcspf')->where('serviceid',$_REQUEST['serviceid'])->update(['updatetime' => $_REQUEST['updatetime'],'bandwidth' => $_REQUEST['bandwidth']]);
+		if(!@$_REQUEST['connnum']){
+			$ConnNum = 0;
 		}else{
-			Capsule::table('mod_whmcspf')->insert(['serviceid' => $_REQUEST['serviceid'],'updatetime' => $_REQUEST['updatetime'],'serviceid' => $_REQUEST['serviceid'],'bandwidth' => $_REQUEST['bandwidth']]);
+			$ConnNum = $_REQUEST['connnum'];
 		}
-		if(($PackAgeINfo->configoption1 < $_REQUEST['bandwidth'])){
+		if(Capsule::table('mod_whmcspf')->where('serviceid',$_REQUEST['serviceid'])->first()){
+			Capsule::table('mod_whmcspf')->where('serviceid',$_REQUEST['serviceid'])->update(['updatetime' => $_REQUEST['updatetime'],'bandwidth' => $BandWidth,'connnum' => $ConnNum]);
+		}else{
+			Capsule::table('mod_whmcspf')->insert(['serviceid' => $_REQUEST['serviceid'],'updatetime' => $_REQUEST['updatetime'],'serviceid' => $_REQUEST['serviceid'],'bandwidth' => $BandWidth,'connnum' => $ConnNum]);
+		}
+		if(($PackAgeINfo->configoption1 < $BandWidth)){
 			//流量超额
 			$unsusptime = date("Y-m", strtotime("+1 months")).'-1';
 			localAPI('ModuleSuspend', array('serviceid' => $_REQUEST['serviceid'],'suspendreason' => '流量超额'), Capsule::table('tbladmins')->first()->id);
 			Capsule::table('tblhosting')->where('id',$_REQUEST['serviceid'])->update(['domainstatus' => 'Suspended']);
 			whmcspf_setCustomfieldsValue('forwardstatus','maxtra',$_REQUEST['serviceid'],null);
 			//如果产品到期时间小于解除暂停的时间,那么不作处理
+			/**
 			if(strtotime($unsusptime) < strtotime(Capsule::table('tblhosting')->where('id',$_REQUEST['serviceid'])->first()->nextduedate)){
 				Capsule::table('mod_whmcspf_suspservice')->insert(['serviceid' => $_REQUEST['serviceid'],'untime' => $unsusptime,'addtime' => date("Y-m-d")]);
 			}
+			**/
+			Capsule::table('mod_whmcspf_suspservice')->insert(['serviceid' => $_REQUEST['serviceid'],'untime' => $unsusptime,'addtime' => date("Y-m-d")]);
 		}
-        whmcspf_setCustomfieldsValue('bandwidth',$_REQUEST['bandwidth'],$_REQUEST['serviceid'],null);
+        whmcspf_setCustomfieldsValue('bandwidth',$BandWidth,$_REQUEST['serviceid'],null);
 		exit('success');
 	}
 }
