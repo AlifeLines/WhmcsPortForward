@@ -22,6 +22,8 @@ CREATE TABLE `pfinfo` (
   `rsip` text NOT NULL,
   `rport` text NOT NULL,
   `sport` text NOT NULL,
+  `maxconnnum` text NOT NULL,
+  `connnum` text NOT NULL,
   `status` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
