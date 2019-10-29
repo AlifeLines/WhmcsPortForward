@@ -23,4 +23,6 @@ $RedisIP = '';
 $RedisPort = 6379;
 //Redis Auth Pass
 $RedisPass = '';
+//带宽限制Interface列表
+$TcInterfaces = array('eth0','eth1');
 //<------- 信息填写结束! ------>
