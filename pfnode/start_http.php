@@ -72,6 +72,7 @@ $http_worker->onMessage = function($connection, $data){
 		if($sqlreturn){
 			$api_redis_client->del(trim($_REQUEST['serviceid']).'_upload');
 			$api_redis_client->del(trim($_REQUEST['serviceid']).'_download');
+			$api_redis_client->del(trim($_REQUEST['serviceid']).'_maxconnnum');
 			$connection->send(json_encode(array('code' => 200,'msg' => '删除成功')));
 		}else{
 			$connection->send(json_encode(array('code' => 500,'msg' => '数据库操作失败')));
