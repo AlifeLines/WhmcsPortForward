@@ -19,6 +19,12 @@ if('[PTYPE]' == 'udp'){
 }else{
     $GlobalProxyService[[SERID]]['worker'] = new Worker('tcp://0.0.0.0:[SPORT]');
 }
+if(!@(($GlobalProxyService[[SERID]]['client'])->get('[SERID]_download'))){
+	($GlobalProxyService[[SERID]]['client'])->set('[SERID]_download',0);
+}
+if(!@(($GlobalProxyService[[SERID]]['client'])->get('[SERID]_upload'))){
+	($GlobalProxyService[[SERID]]['client'])->set('[SERID]_upload',0);
+}
 ($GlobalProxyService[[SERID]]['worker'])->name = 'Service [SERID] Forward Worker';
 if('[PTYPE]' == 'udp'){
 ($GlobalProxyService[[SERID]]['worker'])->onConnect = function($connection)use($GlobalProxyService){
