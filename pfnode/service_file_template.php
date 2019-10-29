@@ -5,6 +5,8 @@ use \Workerman\Lib\Timer;
 require_once __DIR__ . '/../vendor/autoload.php';
 include __DIR__.'/../config.php';
 $GlobalProxyService[[SERID]]['maxconnnum'] = [MAXCONNNUM];
+$GlobalProxyService[[SERID]]['tcstart'] = json_decode('[TCSTART]',true);
+$GlobalProxyService[[SERID]]['tcstop'] = json_decode('[TCSTOP]',true);
 $GlobalProxyService[[SERID]]['client'] = new Predis\Client(['scheme' => 'tcp','host' => $RedisIP,'port' => $RedisPort,'parameters'=>['password' => $RedisPass]]);
 ($GlobalProxyService[[SERID]]['client'])->set('[SERID]_maxconnnum',0);
 if('[PTYPE]' == 'udp'){
@@ -113,5 +115,11 @@ if('[PTYPE]' == 'udp'){
         $connection_to_r->close();
     };
 };
+}
+foreach(($GlobalProxyService[[SERID]]['tcstop']) as $TcstopOne){
+	exec($TcstopOne);
+}
+foreach(($GlobalProxyService[[SERID]]['tcstart']) as $TcstartOne){
+	exec($TcstartOne);
 }
 ($GlobalProxyService[[SERID]]['worker'])->listen();

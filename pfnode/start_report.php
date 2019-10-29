@@ -21,6 +21,7 @@ function report_curl_post_https($url,$data){
 }
 $report_redis_client = new Predis\Client(['scheme' => 'tcp','host' => $RedisIP,'port' => $RedisPort,'parameters'=>['password' => $RedisPass]]);
 $report_worker = new Worker();
+$report_worker->reloadable = false;
 $report_worker->count = 1;
 $report_worker->name = 'Report Service';
 $report_worker->onWorkerStart = function($report_worker)

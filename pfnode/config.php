@@ -33,4 +33,6 @@ $MysqlPassword = '';
 $MysqlDatabase = '';
 //Mysql端口
 $MysqlPort = 3306;
+//带宽限制Interface列表
+$TcInterfaces = array('eth0','eth1');
 //<------- 信息填写结束! ------>

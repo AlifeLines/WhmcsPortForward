@@ -23,6 +23,9 @@ $service_worker->onWorkerReload = function($worker){
 			$_reloadfile_name = @(explode('.',$_reloadfile_name))[0];
 			if(@$GlobalProxyService[$_reloadfile_name]){
 				echo $_reloadfile_name.'STOP!!!'.PHP_EOL;
+				foreach(($GlobalProxyService[$_reloadfile_name]['tcstop']) as $TcstopOne){
+	                exec($TcstopOne);
+                }
 				($GlobalProxyService[$_reloadfile_name]['worker'])->stop();
 				unset($GlobalProxyService[$_reloadfile_name]);
 			}
