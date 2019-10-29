@@ -1,5 +1,5 @@
 <?php
-//Version 2.0
+//Version 3.0
 if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
