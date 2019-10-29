@@ -1,5 +1,5 @@
 <?php
-//Version 2.0
+//Version 3.0
 //<------- 请在下面根据提示填写您的信息! ------>
 //验证用户名
 $authusername = 'admin';
