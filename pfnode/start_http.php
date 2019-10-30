@@ -78,6 +78,21 @@ $http_worker->onMessage = function($connection, $data){
 			$connection->send(json_encode(array('code' => 500,'msg' => '数据库操作失败')));
 		}
 		return ;
+	}elseif(trim($_REQUEST['action']) == 'resetbw'){
+		$DelInfo = Db::table('pfinfo')->where('serviceid',trim($_REQUEST['serviceid']))->find();
+	    if(!$DelInfo){
+			$connection->send(json_encode(array('code' => 500,'msg' => 'ServiceID不存在')));
+			return ;
+	    }
+		$sqlreturn = Db::table('pfinfo')->where('serviceid',trim($_REQUEST['serviceid']))->update(["bandwidth" => '0',"updatetime" => time()]);
+		if($sqlreturn){
+			$api_redis_client->set(trim($_REQUEST['serviceid']).'_upload','0');
+			$api_redis_client->set(trim($_REQUEST['serviceid']).'_download','0');
+			$connection->send(json_encode(array('code' => 200,'msg' => '流量重设成功')));
+		}else{
+			$connection->send(json_encode(array('code' => 500,'msg' => '数据库操作失败')));
+		}
+		return ;
 	}elseif(trim($_REQUEST['action']) == 'update'){
 		$ServiceInfo = Db::table('pfinfo')->where('serviceid',trim($_REQUEST['serviceid']))->find();
 	    if(!$ServiceInfo){
