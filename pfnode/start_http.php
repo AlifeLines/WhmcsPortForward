@@ -171,7 +171,7 @@ function pf_gen_service_php($ptype,$serviceid,$rsip,$rport,$sport,$maxconnnum,$d
 		foreach($TcInterfaces as $TcInterfacesOne){
 			$tcstart[] = 'tc qdisc add dev '.$TcInterfacesOne.' root handle 1: htb';
 			$tcstart[] = 'tc class add dev '.$TcInterfacesOne.' parent 1: classid 1:'.$serviceid.' htb rate '.$dlimit.'Mbps ceil '.$dlimit.'Mbps prio 1';
-			$tcstart[] = 'tc filter add dev '.$TcInterfacesOne.' protocol ipv6 parent 1:0 prio 1 handle '.$serviceid.'0'.' fw flowid 1:'.$serviceid;
+			$tcstart[] = 'tc filter add dev '.$TcInterfacesOne.' protocol ipv6 parent 1:0 prio 2 handle '.$serviceid.'0'.' fw flowid 1:'.$serviceid;
 			$tcstart[] = 'tc filter add dev '.$TcInterfacesOne.' protocol ip parent 1:0 prio 1 handle '.$serviceid.'1'.' fw flowid 1:'.$serviceid;
 			$tcstart[] = 'ip6tables -t mangle -A POSTROUTING -p tcp -d '.$rsip.' --dport '.$rport.' -j MARK --set-mark '.$serviceid.'0';
 			$tcstart[] = 'iptables -A OUTPUT -t mangle -p tcp --sport '.$sport.' -j MARK --set-mark '.$serviceid.'1';
@@ -180,7 +180,7 @@ function pf_gen_service_php($ptype,$serviceid,$rsip,$rport,$sport,$maxconnnum,$d
 		foreach($TcInterfaces as $TcInterfacesOne){
 			$tcstop[] = 'ip6tables -t mangle -D POSTROUTING -p tcp -d '.$rsip.' --dport '.$rport.' -j MARK --set-mark '.$serviceid.'0';
 			$tcstop[] = 'iptables -D OUTPUT -t mangle -p tcp --sport '.$sport.' -j MARK --set-mark '.$serviceid.'1';
-			$tcstop[] = 'tc filter del dev '.$TcInterfacesOne.' protocol ipv6 parent 1:0 prio 1 handle '.$serviceid.'0'.' fw flowid 1:'.$serviceid;
+			$tcstop[] = 'tc filter del dev '.$TcInterfacesOne.' protocol ipv6 parent 1:0 prio 2 handle '.$serviceid.'0'.' fw flowid 1:'.$serviceid;
 			$tcstop[] = 'tc filter del dev '.$TcInterfacesOne.' protocol ip parent 1:0 prio 1 handle '.$serviceid.'1'.' fw flowid 1:'.$serviceid;
 			$tcstop[] = 'tc class del dev '.$TcInterfacesOne.' parent 1: classid 1:'.$serviceid.' htb rate '.$dlimit.'Mbps ceil '.$dlimit.'Mbps prio 1';
 		}
