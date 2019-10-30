@@ -1,5 +1,5 @@
 <?php
-//Version 3.0
+//Version 4.0
 if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
@@ -132,7 +132,8 @@ function portforward_RebuildConf(array $params)
 function portforward_AdminCustomButtonArray(){
     return array(
         "重建" => "RebuildConf",
-		"同步配置" => "SyncConf"
+		"同步配置" => "SyncConf",
+		"重设已使用流量" => "resetbw"
     );
 }
 
@@ -219,6 +220,35 @@ function portforward_TerminateAccount(array $params)
 			return 'success';
         }else{
             throw new Exception('删除失败,'.$ReturnInfo['msg']);
+		}			 
+    } catch (Exception $e) {
+        logModuleCall(
+            'portforward',
+            __FUNCTION__,
+            $params,
+            $e->getMessage(),
+            $e->getTraceAsString()
+        );
+
+        return $e->getMessage();
+    }
+}
+
+function portforward_resetbw(array $params)
+{
+    try {
+		$postfields['username'] = $params['serverusername'];
+		$postfields['password'] = $params['serverpassword'];
+		$postfields['action'] = 'resetbw';
+		$postfields['serviceid'] = $params['serviceid'];
+		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
+        if(!$ReturnInfo){
+            throw new Exception('服务器返回信息为空');	
+		}
+        if($ReturnInfo['code'] == 200){	 
+			return 'success';
+        }else{
+            throw new Exception('重设流量失败,'.$ReturnInfo['msg']);
 		}			 
     } catch (Exception $e) {
         logModuleCall(

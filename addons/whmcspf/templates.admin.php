@@ -64,7 +64,7 @@ $Footer = <<<Footer
 </script>
 
 <script type="text/javascript" src="../modules/addons/whmcspf/static/js/jquery-confirm.js"></script>
-<hr/><p style='float:right'>当前运行版本: v3.0</p>
+<hr/><p style='float:right'>当前运行版本: v4.0</p>
 Footer;
 $info_management = <<<info_managementtemp
 <div class="info-body">

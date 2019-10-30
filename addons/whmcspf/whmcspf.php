@@ -9,7 +9,7 @@ function whmcspf_config()
         'name' => '端口转发流量统计', 
         'description' => '端口转发流量统计', 
         'author' => 'Flyqie',
-        'version' => '3.0',
+        'version' => '4.0',
         'fields' => array(
             'authkey' => array(
                 'FriendlyName' => '验证密钥',
@@ -167,6 +167,7 @@ function whmcspf_clientarea($vars)
 	}
 }
 
+if(!function_exists('whmcspf_setCustomfieldsValue')){
 function whmcspf_setCustomfieldsValue($field,$value,$servid,$uid){
     $ownerRow = Capsule::table('tblhosting')->where('id',$servid)->first();
     if (!$ownerRow){
@@ -188,4 +189,5 @@ function whmcspf_setCustomfieldsValue($field,$value,$servid,$uid){
 			Capsule::table('tblcustomfieldsvalues')->insert(['relid' => $ownerRow->id,'fieldid' => $res->id,'value' => $value]);
 		}
     }
+}
 }
