@@ -15,8 +15,14 @@ function report_curl_post_https($url,$data){
     curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
     $tmpInfo = curl_exec($curl); // 执行操作
+	$httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
+	if(!$tmpInfo){
+		$ErrorMsg = curl_error($curl);
+	}else{
+		$ErrorMsg = null;
+	}
     curl_close($curl); // 关闭CURL会话
-    return $tmpInfo; // 返回数据
+    return array('data' => $tmpInfo,'httpcode' => $httpCode,'errormsg' => $ErrorMsg); // 返回数据
 }
 }
 $report_redis_client = new Predis\Client(['scheme' => 'tcp','host' => $RedisIP,'port' => $RedisPort,'parameters'=>['password' => $RedisPass]]);
@@ -38,9 +44,9 @@ $report_worker->onWorkerStart = function($report_worker)
         }
 		foreach ($data as $dataone){
 			$returnstatus = report_curl_post_https($websiteurl.'/?m=whmcspf&action=reporttraffic',array('serviceid' => $dataone['serviceid'],'authkey' => $WebsiteAuthkey,'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum']));
-			if(trim($returnstatus) != 'success'){
-				echo '['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum'])).'时失败,服务器返回'.$returnstatus.PHP_EOL;
-				file_put_contents('error.log','['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum'])).'时失败,服务器返回'.$returnstatus.PHP_EOL,FILE_APPEND);
+			if(trim($returnstatus['data']) != 'success'){
+				echo '['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum'])).'时失败,服务器返回'.json_encode($returnstatus).PHP_EOL;
+				file_put_contents('error.log','['.date("Y-m-d h:i:sa").'] '.'上报'.json_encode(array('serviceid' => $dataone['serviceid'],'updatetime' => $dataone['updatetime'],'bandwidth' => $dataone['bandwidth'],'connnum' => $dataone['connnum'])).'时失败,服务器返回'.json_encode($returnstatus).PHP_EOL,FILE_APPEND);
 			}
 		}
         unset($data);
