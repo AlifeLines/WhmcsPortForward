@@ -24,6 +24,7 @@ CREATE TABLE `pfinfo` (
   `sport` text NOT NULL,
   `maxconnnum` text NOT NULL,
   `connnum` text NOT NULL,
+  `dlimit` text NOT NULL,
   `status` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

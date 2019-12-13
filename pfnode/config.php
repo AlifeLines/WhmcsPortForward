@@ -1,5 +1,5 @@
 <?php
-//Version 2.0
+//Version 4.0
 //<------- 请在下面根据提示填写您的信息! ------>
 //验证用户名
 $authusername = 'admin';
@@ -33,4 +33,6 @@ $MysqlPassword = '';
 $MysqlDatabase = '';
 //Mysql端口
 $MysqlPort = 3306;
+//带宽限制Interface列表
+$TcInterfaces = array('eth0','eth1');
 //<------- 信息填写结束! ------>

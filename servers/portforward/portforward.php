@@ -1,5 +1,5 @@
 <?php
-//Version 2.0
+//Version 4.0
 if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
@@ -24,6 +24,10 @@ function portforward_ConfigOptions()
 		'最大连接数' => array(
             'Type' => 'text',
             'Size' => '500'
+        ),
+		'最大带宽(Mbps)' => array(
+            'Type' => 'text',
+            'Size' => '500'
         )
     );
 }
@@ -44,6 +48,7 @@ function portforward_CreateAccount(array $params)
 		$postfields['ptype'] = trim($params['customfields']['ptype']);
 		$postfields['rport'] = trim($params['customfields']['rport']);
 		$postfields['rsip'] = trim($params['customfields']['rsip']);
+		$postfields['dlimit'] = trim($params['configoption3']);
 		$postfields['maxconnnum'] = trim($params['configoption2']);
 		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
         if(!$ReturnInfo){
@@ -127,7 +132,8 @@ function portforward_RebuildConf(array $params)
 function portforward_AdminCustomButtonArray(){
     return array(
         "重建" => "RebuildConf",
-		"同步配置" => "SyncConf"
+		"同步配置" => "SyncConf",
+		"重设已使用流量" => "resetbw"
     );
 }
 
@@ -148,6 +154,7 @@ function portforward_SyncConf(array $params)
 		$postfields['rport'] = trim($params['customfields']['rport']);
 		$postfields['rsip'] = trim($params['customfields']['rsip']);
 		$postfields['maxconnnum'] = trim($params['configoption2']);
+		$postfields['dlimit'] = trim($params['configoption3']);
 		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
         if(!$ReturnInfo){
             throw new Exception('服务器返回信息为空');	
@@ -227,6 +234,35 @@ function portforward_TerminateAccount(array $params)
     }
 }
 
+function portforward_resetbw(array $params)
+{
+    try {
+		$postfields['username'] = $params['serverusername'];
+		$postfields['password'] = $params['serverpassword'];
+		$postfields['action'] = 'resetbw';
+		$postfields['serviceid'] = $params['serviceid'];
+		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
+        if(!$ReturnInfo){
+            throw new Exception('服务器返回信息为空');	
+		}
+        if($ReturnInfo['code'] == 200){	 
+			return 'success';
+        }else{
+            throw new Exception('重设流量失败,'.$ReturnInfo['msg']);
+		}			 
+    } catch (Exception $e) {
+        logModuleCall(
+            'portforward',
+            __FUNCTION__,
+            $params,
+            $e->getMessage(),
+            $e->getTraceAsString()
+        );
+
+        return $e->getMessage();
+    }
+}
+
 function portforward_ClientArea(array $params)
 {
 	if($_REQUEST['pfaction'] == 'changevalue'){
@@ -247,6 +283,7 @@ function portforward_ClientArea(array $params)
 		$postfields['rport'] = trim($_REQUEST['rport']);
 		$postfields['ptype'] = trim($params['customfields']['ptype']);
 		$postfields['maxconnnum'] = trim($params['configoption2']);
+		$postfields['dlimit'] = trim($params['configoption3']);
 		$ReturnInfo = json_decode(portforward_curlconnect('http://'.$params['serverip'].':1388/',$postfields),true);
         if(!$ReturnInfo){
             exit(json_encode(array('result' => 'failed','msg' => 'ServiceID不存在')));
@@ -283,7 +320,10 @@ function portforward_ClientArea(array $params)
 	$templatevar['rsip'] = trim($params['customfields']['rsip']);
 	$templatevar['rport'] = trim($params['customfields']['rport']);
 	$templatevar['usedbandwidth'] = trim($params['customfields']['bandwidth']);
+	$templatevar['usedconnnum'] = trim($params['customfields']['connnum']);
 	$templatevar['alldbandwidth'] = trim($params['configoption1']);
+	$templatevar['maxconnnum'] = trim($params['configoption2']);
+	$templatevar['dlimit'] = trim($params['configoption3']);
 	$templatevar['freedbandwidth'] = $templatevar['alldbandwidth'] - $templatevar['usedbandwidth'];
 	if((int)$templatevar['freedbandwidth'] < 0){
 		$templatevar['freedbandwidth'] = '0';

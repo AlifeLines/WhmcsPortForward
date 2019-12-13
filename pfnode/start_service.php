@@ -10,7 +10,9 @@ if(!@$GlobalProxyService){
 $service_worker->onWorkerStart = function(){
 	global $GlobalProxyService;
     foreach(glob(__DIR__.'/forward_service/*.php') as $start_filet){
+	   echo 'Debug: '.$start_filet.' Will Be load'.PHP_EOL;
 	   require $start_filet;
+	   echo 'Debug: '.$start_filet.' load done'.PHP_EOL;
     }
 };
 $service_worker->onWorkerReload = function($worker){
@@ -22,13 +24,21 @@ $service_worker->onWorkerReload = function($worker){
 			$_reloadfile_name = pathinfo($_reloadfile, PATHINFO_BASENAME);
 			$_reloadfile_name = @(explode('.',$_reloadfile_name))[0];
 			if(@$GlobalProxyService[$_reloadfile_name]){
-				echo $_reloadfile_name.'STOP!!!'.PHP_EOL;
+				echo 'Debug:Service '.$_reloadfile_name.' Will be stop'.PHP_EOL;
+				echo 'Debug:Service '.$_reloadfile_name.' Run Worker TC Stop Commond....'.PHP_EOL;
+				foreach(($GlobalProxyService[$_reloadfile_name]['tcstop']) as $TcstopOne){
+					echo 'Debug:Service '.$_reloadfile_name.' Run Worker TC Stop Commond:['.$TcstopOne.']....'.PHP_EOL;
+	                exec($TcstopOne);
+                }
+				echo 'Debug:Service '.$_reloadfile_name.' Run Worker Stop Commond....'.PHP_EOL;	
 				($GlobalProxyService[$_reloadfile_name]['worker'])->stop();
+				echo 'Debug:Service '.$_reloadfile_name.' Will be Unset....'.PHP_EOL;	
 				unset($GlobalProxyService[$_reloadfile_name]);
 			}
 			if(file_exists($_reloadfile)){
+				echo 'Debug:'.$_reloadfile.' Will be Reinclude....'.PHP_EOL;
 				require $_reloadfile;
-				echo $_reloadfile.'START!!!'.PHP_EOL;
+				echo 'Debug:'.$_reloadfile.' load done....'.PHP_EOL;
 			}
 		}
     }

@@ -40,12 +40,12 @@ function autoload_check_files_change($monitor_dir){
             continue;
         }
 		if(empty(@$Keys[0]) && @$Keys[0] != 0){
-			echo $file." update and reload#1\n";
+			echo 'Debug:'.$file." update and reload#1".PHP_EOL;
             $NeedReloadFile[] = (string)$file;
 			continue;
 		}
         if($autoload_last_mtime < $file->getMTime()){
-            echo $file." update and reload#2\n";
+			echo 'Debug:'.$file." update and reload#2".PHP_EOL;
             $NeedReloadFile[] = (string)$file;
 			continue;
         }
@@ -59,7 +59,7 @@ function autoload_check_files_change($monitor_dir){
 		}
 	}
 	if(count($NeedReloadFile) > 0){
-		echo "All update and reload\n";
+		echo 'Debug:All update and reload'.PHP_EOL;
         $autoload_last_mtime = time();
 	    file_put_contents(__DIR__.'/autoload.tmp',json_encode(array('list' => $tmplist,'lastmtime' => $autoload_last_mtime)));
 		file_put_contents(__DIR__.'/autoreload.tmp',json_encode(array('reloadfile' => $NeedReloadFile)));
