@@ -1,5 +1,5 @@
 <?php
-//Version 2.0
+//Version 4.0
 //<------- 请在下面根据提示填写您的信息! ------>
 //验证用户名
 $authusername = 'admin';
@@ -23,4 +23,6 @@ $RedisIP = '';
 $RedisPort = 6379;
 //Redis Auth Pass
 $RedisPass = '';
+//带宽限制Interface列表
+$TcInterfaces = array('eth0','eth1');
 //<------- 信息填写结束! ------>

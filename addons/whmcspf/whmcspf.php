@@ -9,7 +9,7 @@ function whmcspf_config()
         'name' => '端口转发流量统计', 
         'description' => '端口转发流量统计', 
         'author' => 'Flyqie',
-        'version' => '2.0',
+        'version' => '4.0',
         'fields' => array(
             'authkey' => array(
                 'FriendlyName' => '验证密钥',
@@ -72,9 +72,11 @@ function whmcspf_output($vars)
 			if($PackAgeINfo){
 				$AllBandwidth = $PackAgeINfo->configoption1;
 				$maxconnnum = $PackAgeINfo->configoption2;
+				$dlimit = $PackAgeINfo->configoption3;
 			}else{
 				$AllBandwidth = 0;
 				$maxconnnum = 0;
+				$dlimit = 0;
 			}
 			//$AllBandwidth = $PackAgeINfo->configoption1;
 			$FreeBandwidth = $AllBandwidth - $values->bandwidth;
@@ -96,6 +98,7 @@ function whmcspf_output($vars)
 			$infolistarray[$num]['allbandwidth'] = $AllBandwidth;
 			$infolistarray[$num]['updatetime'] = date('Y-m-d H:i:s', $values->updatetime);
 			$infolistarray[$num]['unsptime'] = $unsptime;
+			$infolistarray[$num]['dlimit'] = $dlimit;
 			$infolistarray[$num]['status'] = $Status;
 			$infolistarray[$num]['maxconnnum'] = $maxconnnum;
 			$num++;
@@ -159,10 +162,12 @@ function whmcspf_clientarea($vars)
 			Capsule::table('mod_whmcspf_suspservice')->insert(['serviceid' => $_REQUEST['serviceid'],'untime' => $unsusptime,'addtime' => date("Y-m-d")]);
 		}
         whmcspf_setCustomfieldsValue('bandwidth',$BandWidth,$_REQUEST['serviceid'],null);
+		whmcspf_setCustomfieldsValue('connnum',$ConnNum,$_REQUEST['serviceid'],null);
 		exit('success');
 	}
 }
 
+if(!function_exists('whmcspf_setCustomfieldsValue')){
 function whmcspf_setCustomfieldsValue($field,$value,$servid,$uid){
     $ownerRow = Capsule::table('tblhosting')->where('id',$servid)->first();
     if (!$ownerRow){
@@ -184,4 +189,5 @@ function whmcspf_setCustomfieldsValue($field,$value,$servid,$uid){
 			Capsule::table('tblcustomfieldsvalues')->insert(['relid' => $ownerRow->id,'fieldid' => $res->id,'value' => $value]);
 		}
     }
+}
 }

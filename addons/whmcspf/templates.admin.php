@@ -64,7 +64,7 @@ $Footer = <<<Footer
 </script>
 
 <script type="text/javascript" src="../modules/addons/whmcspf/static/js/jquery-confirm.js"></script>
-<hr/><p style='float:right'>当前运行版本: v2.0</p>
+<hr/><p style='float:right'>当前运行版本: v4.0</p>
 Footer;
 $info_management = <<<info_managementtemp
 <div class="info-body">
@@ -88,6 +88,7 @@ $info_management = <<<info_managementtemp
 						<th>总流量(Mb)</th>
 						<th>当前连接数</th>
 						<th>最大连接数</th>
+						<th>最大带宽(Mbps)</th>
 						<th>状态</th>
 						<th>解禁时间</th>
 						<th>更新时间</th>
@@ -171,6 +172,7 @@ var load_info = function(){
 				infos[info].allbandwidth,
 				infos[info].connnum,
 				infos[info].maxconnnum,
+				infos[info].dlimit,
 				infos[info].status,
 				infos[info].unsptime,
                 infos[info].updatetime

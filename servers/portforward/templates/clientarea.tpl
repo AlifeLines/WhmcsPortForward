@@ -151,6 +151,36 @@
                 </div>
              </div>
         </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="box">
+                <div class="boxTitle">
+                    当前连接数
+                </div>
+                <div>
+                  <span class="boxContent">{$usedconnnum}</span>
+                </div>
+             </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="box">
+                <div class="boxTitle">
+                    最大连接数
+                </div>
+                <div>
+                  <span class="boxContent">{$maxconnnum}</span>
+                </div>
+             </div>
+        </div>
+        <div class="col-md-4 col-sm-12">
+            <div class="box">
+                <div class="boxTitle">
+                    最大带宽
+                </div>
+                <div>
+                  <span class="boxContent">{$dlimit} Mbps</span>
+                </div>
+             </div>
+        </div>
 	</div>
 </div>
 {literal}
